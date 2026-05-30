@@ -41,9 +41,9 @@
             </tr>
             <tr class="table_content" th:each="o:${list}">
                 <td class="input_checkbox">
-                    <input id="1" type="checkbox" checked="checked" name="checkbox" th:value="${o.sid}"/></td>
+                    <input th:id="'cart_' + ${o.id}" type="checkbox" checked="checked" name="checkbox" th:value="${o.sid}"/></td>
                 <td class="show_img">
-                    <img src="/img/home/feature_prodects/cont1.jpg" th:src="${o.image}" th:value="${o.sid}"
+                    <img src="/img/home/feature_prodects/cont1.jpg" th:src="@{'/' + ${o.image}}" th:value="${o.sid}"
                          th:title="${o.name}"/></td>
                 <td class="title" colspan="2"><span th:text="${o.name}">这是一个商品</span></td>
                 <td class="cost">￥<span th:text="${o.price}">20.00</span>元</td>
@@ -86,7 +86,7 @@
             <tr class="end_pay">
                 <td class="is_all"><input id="all" type="checkbox" checked="checked"/>全选</td>
                 <td class="space" colspan="3"></td>
-                <td colspan="2" class="all_sum">总价：￥<span>500.00</span>元</td>
+                <td colspan="2" class="all_sum">总价：￥<span id="totalPrice">0.00</span>元</td>
                 <td colspan="3" class="pay_button_div">
                     <button class="pay_button">结算</button>
                 </td>

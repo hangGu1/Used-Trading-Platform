@@ -119,16 +119,24 @@ public class HomeController {
     private String getSortName(int sort) {
         StringBuilder stringBuffer = new StringBuilder();
         Specific specific = selectSpecificBySort(sort);
+        if (specific == null) {
+            return "未分类";
+        }
         int cid = specific.getCid();
         Classification classification = selectClassificationByCid(cid);
+        if (classification == null) {
+            return "未分类";
+        }
         int aid = classification.getAid();
         AllKinds allKinds = selectAllKindsByAid(aid);
+        if (allKinds == null) {
+            return "未分类";
+        }
         stringBuffer.append(allKinds.getName());
         stringBuffer.append("-");
         stringBuffer.append(classification.getName());
         stringBuffer.append("-");
         stringBuffer.append(specific.getName());
-//        System.out.println(sort);
         return stringBuffer.toString();
     }
 

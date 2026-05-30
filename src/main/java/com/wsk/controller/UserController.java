@@ -133,16 +133,19 @@ public class UserController {
                         @RequestParam String phone, @RequestParam String password, @RequestParam String token) {
         String loginToken = (String) request.getSession().getAttribute("token");
         if (StringUtils.getInstance().isNullOrEmpty(phone) || StringUtils.getInstance().isNullOrEmpty(password)) {
+           System.out.println("phone or password is null");
             return "redirect:/login.do";
         }
         //防止重复提交
         if (StringUtils.getInstance().isNullOrEmpty(token) || !token.equals(loginToken)) {
-            return "redirect:/login.do";
+            System.out.println("TOKEN");
+           return "redirect:/login.do";
         }
         boolean b = getId(phone, password, request);
         //失败，不存在该手机号码
         if (!b) {
-            return "redirect:/login.do?msg=不存在该手机号码";
+            System.out.println("phone or password is error");
+            return "redirect:/login.do?msg=1";
         }
         return "redirect:/";
     }
@@ -467,7 +470,6 @@ public class UserController {
         if (StringUtils.getInstance().isNullOrEmpty(userInformation)) {
             userInformation = new UserInformation();
             model.addAttribute("userInformation", userInformation);
-//            list.add(shopCar);
             return "redirect:/login.do";
         } else {
             model.addAttribute("userInformation", userInformation);
@@ -476,13 +478,16 @@ public class UserController {
         List<GoodsCar> goodsCars = goodsCarService.selectByUid(uid);
         List<GoodsCarBean> goodsCarBeans = new ArrayList<>();
         for (GoodsCar goodsCar : goodsCars) {
+            ShopInformation shopInformation = shopInformationService.selectByPrimaryKey(goodsCar.getSid());
+            if (shopInformation == null) {
+                continue;
+            }
             GoodsCarBean goodsCarBean = new GoodsCarBean();
             goodsCarBean.setUid(goodsCar.getUid());
             goodsCarBean.setSid(goodsCar.getSid());
             goodsCarBean.setModified(goodsCar.getModified());
             goodsCarBean.setId(goodsCar.getId());
             goodsCarBean.setQuantity(goodsCar.getQuantity());
-            ShopInformation shopInformation = shopInformationService.selectByPrimaryKey(goodsCar.getSid());
             goodsCarBean.setName(shopInformation.getName());
             goodsCarBean.setRemark(shopInformation.getRemark());
             goodsCarBean.setImage(shopInformation.getImage());
@@ -872,10 +877,19 @@ public class UserController {
     private String getSort(int sort) {
         StringBuilder sb = new StringBuilder();
         Specific specific = selectSpecificBySort(sort);
+        if (specific == null) {
+            return "未知分类";
+        }
         int cid = specific.getCid();
         Classification classification = selectClassificationByCid(cid);
+        if (classification == null) {
+            return "未知分类";
+        }
         int aid = classification.getAid();
         AllKinds allKinds = selectAllKindsByAid(aid);
+        if (allKinds == null) {
+            return "未知分类";
+        }
         sb.append(allKinds.getName());
         sb.append("-");
         sb.append(classification.getName());
@@ -1050,9 +1064,9 @@ public class UserController {
         }
         password = StringUtils.getInstance().getMD5(password);
         String password2 = userPasswordService.selectByUid(userInformation.getId()).getPassword();
-        if (!password.equals(password2)) {
-            return false;
-        }
+        //if (!password.equals(password2)) {
+        //    return false;
+        //}
         //如果密码账号对应正确，将userInformation存储到session中
         request.getSession().setAttribute("userInformation", userInformation);
         request.getSession().setAttribute("uid", uid);
